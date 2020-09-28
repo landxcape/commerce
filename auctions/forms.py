@@ -2,7 +2,7 @@ from django import forms
 
 
 class CreateListingForm(forms.Form):
-    listing = forms.CharField(
+    title = forms.CharField(
         label="Title:",
         required=True,
         widget=forms.TextInput(attrs={
@@ -26,12 +26,14 @@ class CreateListingForm(forms.Form):
     )
     image_url = forms.URLField(
         label="URL to Listing Image:",
+        required=False,
         widget=forms.TextInput(attrs={
             "class": "form-control"
         })
     )
     category = forms.CharField(
         label="Category:",
+        required=False,
         widget=forms.TextInput(attrs={
             "class": "form-control"
         })

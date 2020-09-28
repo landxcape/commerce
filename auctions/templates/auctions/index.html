@@ -6,28 +6,27 @@
 <div class="container">
     {% for active_listing in active_listings %}
     <div class="row">
-        <div class="column">
-            <div class="col-3">
-                <img src="{{ active_listing.image_url }}" alt="{{ active_listing.title }}" style="width: 100%;">
-            </div>
-            <div class="col-9">
-                <ul>
-                    <li>
-                        <strong>{{ active_listing.title }}</strong>
-                    </li>
-                    <li>
-                        <strong>Price:</strong> {{ active_listing.bid }}
-                    </li>
-                    <li>
-                        {{ active_listing.description }}
-                    </li>
-                    <li style="color: gray;">
-                        Created: {{ active_listing.creation_time }}
-                    </li>
-                </ul>
-            </div>
+        <div class="col-3" style="height: 100px; width: 100px">
+            <img src="{{ active_listing.image_url }}" alt="{{ active_listing.title }}" style="height: 100%;">
+        </div>
+        <div class="col-9">
+            <ul>
+                <li>
+                    <strong>{{ active_listing.title }}</strong>
+                </li>
+                <li>
+                    <strong>Price: ${{ active_listing.bid }}</strong>
+                </li>
+                <li>
+                    {{ active_listing.description }}
+                </li>
+                <li style="color: gray;">
+                    Created: {{ active_listing.creation_time }}
+                </li>
+            </ul>
         </div>
     </div>
+    <hr class="m-3">
     {% endfor %}
 </div>
 

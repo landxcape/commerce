@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import User, AuctionListings
 from .forms import CreateListingForm
@@ -62,8 +63,7 @@ def register(request):
             })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
-    else:
-        return render(request, "auctions/register.html")
+    return render(request, "auctions/register.html")
 
 
 def categories(request):
@@ -74,7 +74,26 @@ def watchlist(request):
     return render(request, "auctions/watchlist.html")
 
 
+@login_required(login_url="login")
 def create_listing(request):
+    if request.method == "POST":
+        title = request.POST["title"]
+        description = request.POST["description"]
+        bid = request.POST["bid"]
+        image_url = request.POST["image_url"]
+        category = request.POST["category"]
+        a = AuctionListings(
+            title=title,
+            description=description,
+            bid=bid,
+            image_url=image_url,
+            category=category
+        )
+        a.save()
+        return render(request, "auctions/create_listing.html", {
+            "message": "Saved...",
+            "create_listing_form": CreateListingForm()
+        })
     return render(request, "auctions/create_listing.html", {
         "create_listing_form": CreateListingForm()
     })
