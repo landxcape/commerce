@@ -6,26 +6,25 @@
 <div class="container">
     {% for active_listing in active_listings %}
     <div class="row">
-        <div class="col-3" style="height: 100px; width: 100px">
+        <div class="col-3" style="width: auto; max-height: 100px">
             <img src="{{ active_listing.image_url }}" alt="{{ active_listing.title }}" style="height: 100%;">
         </div>
-        <div class="col-9">
-            <ul>
-                <li>
-                    <strong>{{ active_listing.title }}</strong>
-                </li>
-                <li>
-                    <strong>Price: ${{ active_listing.bid }}</strong>
-                </li>
-                <li>
-                    {{ active_listing.description }}
-                </li>
-                <li style="color: gray;">
-                    Created: {{ active_listing.creation_time }}
-                </li>
-            </ul>
+        <div class="col-9" style="max-height: 100px;">
+            <div class="row overflow-hidden" style="height: 25%;">
+                <strong>{{ active_listing.title }}</strong>
+            </div>
+            <div class="row overflow-hidden" style="height: 25%;">
+                <strong>Price: ${{ active_listing.bid.all.first.amount }}</strong>
+            </div>
+            <div class="row overflow-hidden" style="height: 25%;">
+                {{ active_listing.description }}
+            </div>
+            <div class="row overflow-hidden" style="color: gray; height: 25%;">
+                Created: {{ active_listing.creation_time }}
+            </div>
         </div>
     </div>
+    <div>posted by: {{ active_listing.user_id.username }}</div>
     <hr class="m-3">
     {% endfor %}
 </div>

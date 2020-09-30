@@ -5,13 +5,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, AuctionListings
+from .models import User, AuctionListings, Bids
 from .forms import CreateListingForm
 
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "active_listings": AuctionListings.objects.all()
+        "active_listings": AuctionListings.objects.all(),
     })
 
 
@@ -83,13 +83,18 @@ def create_listing(request):
         image_url = request.POST["image_url"]
         category = request.POST["category"]
         a = AuctionListings(
+            user_id=request.user,
             title=title,
             description=description,
-            bid=bid,
             image_url=image_url,
             category=category
         )
+        b = Bids(
+            listing_id=a,
+            amount=bid
+        )
         a.save()
+        b.save()
         return render(request, "auctions/create_listing.html", {
             "message": "Saved...",
             "create_listing_form": CreateListingForm()

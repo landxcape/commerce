@@ -19,12 +19,12 @@ class AuctionListings(models.Model):
 
 class Bids(models.Model):
     listing_id = models.ForeignKey(
-        AuctionListings, on_delete=models.CASCADE, related_name="bids")
+        AuctionListings, on_delete=models.CASCADE, related_name="bid")
     amount = models.IntegerField()
 
 
 class Comments(models.Model):
     listing_id = models.ForeignKey(
-        AuctionListings, on_delete=models.CASCADE, related_name="comments")
+        AuctionListings, blank=True, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField()
     created_date = models.DateTimeField(auto_now=True)
