@@ -5,26 +5,28 @@
 
 <div class="container">
     {% for active_listing in active_listings %}
-    <div class="row">
-        <div class="col-3" style="width: auto; max-height: 100px">
-            <img src="{{ active_listing.image_url }}" alt="{{ active_listing.title }}" style="height: 100%;">
+    <a href="{% url 'listing' active_listing.id %}" style="color: black;">
+        <div class="row list-box">
+            <div class="col-3" style="width: auto; max-height: 100px">
+                <img src="{{ active_listing.image_url }}" alt="{{ active_listing.title }}" style="height: 100%;">
+            </div>
+            <div class="col-9" style="max-height: 100px;">
+                <div class="row overflow-hidden" style="height: 25%;">
+                    <strong>{{ active_listing.title }}</strong>
+                </div>
+                <div class="row overflow-hidden" style="height: 25%;">
+                    <strong>Price: ${{ active_listing.bid.all.first.amount }}</strong>
+                </div>
+                <div class="row overflow-hidden" style="height: 25%;">
+                    {{ active_listing.description }}
+                </div>
+                <div class="row overflow-hidden" style="color: gray; height: 25%;">
+                    Created on: {{ active_listing.creation_time }}
+                </div>
+            </div>
+            <div>posted by: {{ active_listing.user_id.username }}</div>
         </div>
-        <div class="col-9" style="max-height: 100px;">
-            <div class="row overflow-hidden" style="height: 25%;">
-                <strong>{{ active_listing.title }}</strong>
-            </div>
-            <div class="row overflow-hidden" style="height: 25%;">
-                <strong>Price: ${{ active_listing.bid.all.first.amount }}</strong>
-            </div>
-            <div class="row overflow-hidden" style="height: 25%;">
-                {{ active_listing.description }}
-            </div>
-            <div class="row overflow-hidden" style="color: gray; height: 25%;">
-                Created on: {{ active_listing.creation_time }}
-            </div>
-        </div>
-    </div>
-    <div>posted by: {{ active_listing.user_id.username }}</div>
+    </a>
     <hr class="m-3">
     {% endfor %}
 </div>
