@@ -11,3 +11,6 @@ body {
 .list-box:hover {
     border-color: skyblue;
 }
+.container > a:hover {
+    text-decoration: none;
+}

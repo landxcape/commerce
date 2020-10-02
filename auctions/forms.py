@@ -41,3 +41,13 @@ class CreateListingForm(forms.Form):
             "class": "form-control"
         })
     )
+
+
+class PlaceBidForm(forms.Form):
+    place_bid = forms.IntegerField(
+        required=True,
+        widget=forms.NumberInput(attrs={
+            "class": "form-control",
+            "placeholder": "Bid"
+        }),
+    )

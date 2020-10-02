@@ -1,12 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from .models import User, AuctionListings, Bids
-from .forms import CreateListingForm
+from .forms import CreateListingForm, PlaceBidForm
 
 
 def index(request):
@@ -82,21 +83,30 @@ def create_listing(request):
         bid = request.POST["bid"]
         image_url = request.POST["image_url"]
         category = request.POST["category"]
-        a = AuctionListings(
-            user_id=request.user,
-            title=title,
-            description=description,
-            image_url=image_url,
-            category=category
-        )
-        b = Bids(
-            listing_id=a,
-            amount=bid
-        )
-        a.save()
-        b.save()
+        try:
+            auction_listing = AuctionListings(
+                user_id=request.user,
+                title=title,
+                description=description,
+                image_url=image_url,
+                category=category
+            )
+            bid = Bids(
+                listing_id=auction_listing,
+                user_id=request.user,
+                amount=bid
+            )
+            auction_listing.save()
+            bid.save()
+            message = "Saved..."
+        except IntegrityError:
+            if auction_listing.id:
+                auction_listing.delete()
+            if bid.id:
+                bid.delete()
+            message = "Error. Fill the form correctly."
         return render(request, "auctions/create_listing.html", {
-            "message": "Saved...",
+            "message": message,
             "create_listing_form": CreateListingForm()
         })
     return render(request, "auctions/create_listing.html", {
@@ -104,7 +114,19 @@ def create_listing(request):
     })
 
 
-def listing(request, title):
+@login_required(login_url="login")
+def listing(request, _listing_id):
     return render(request, "auctions/listing.html", {
-        "title": title
+        "listing": AuctionListings.objects.get(id=_listing_id),
+        "place_bid_form": PlaceBidForm()
+    })
+
+
+@login_required(login_url="login")
+def place_bid(request, _listing_id):
+    if request.method == "POST":
+        pass
+    return render(request, "auctions/index.html", {
+        "message": "Select a product first to bid...",
+        "active_listings": AuctionListings.objects.all(),
     })

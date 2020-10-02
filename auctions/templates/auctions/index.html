@@ -3,6 +3,12 @@
 {% block body %}
 <h2>Active Listings</h2>
 
+
+{% if message %}
+<div>{{ message }}</div>
+{% endif %}
+
+
 <div class="container">
     {% for active_listing in active_listings %}
     <a href="{% url 'listing' active_listing.id %}" style="color: black;">
@@ -15,7 +21,7 @@
                     <strong>{{ active_listing.title }}</strong>
                 </div>
                 <div class="row overflow-hidden" style="height: 25%;">
-                    <strong>Price: ${{ active_listing.bid.all.first.amount }}</strong>
+                    <strong>Price: ${{ active_listing.bid.all.last.amount }}</strong>
                 </div>
                 <div class="row overflow-hidden" style="height: 25%;">
                     {{ active_listing.description }}
