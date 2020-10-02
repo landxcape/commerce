@@ -1,8 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.db.models import Max
-from django.core.exceptions import ValidationError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -122,7 +121,7 @@ def listing(request, _listing_id):
         Max('amount')).get("amount__max")
     return render(request, "auctions/listing.html", {
         "listing": get_listing,
-        "max_bid": Bids.objects.filter(amount=max_bid).last()
+        "max_bid": Bids.objects.filter(amount=max_bid).first()
     })
 
 
@@ -137,13 +136,9 @@ def place_bid(request, _listing_id):
                 amount=_place_bid
             )
             p_bid.save()
-            message = "Saved..."
+            return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
         except IntegrityError:
-            message = "Error. Fill the bid correctly."
-        return render(request, "auctions/listing.html", {
-            "message": message,
-            "listing": AuctionListings.objects.get(id=_listing_id),
-        })
+            return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
     return render(request, "auctions/index.html", {
         "message": "Select a product first to bid...",
         "active_listings": AuctionListings.objects.all(),

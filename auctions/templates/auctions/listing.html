@@ -27,7 +27,7 @@
 
     <form action="{% url 'place_bid' listing.id %}" method="POST">
         {% csrf_token %}
-        <p style="font-size: 10px;">{{ listing.bid.all.count }} bid(s) so far.</p>
+        <p style="font-size: 10px;">{{ listing.bid.all.count }} bid(s) so far. at {{ max_bid.creation_date }}</p>
         <div class="form-group">
             <input type="number" name="place_bid" class="form-control" placeholder="Bid" required=true
                 min="{{ max_bid.amount }}">
