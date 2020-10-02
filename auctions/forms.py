@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator
 from django import forms
 
 
@@ -25,7 +24,6 @@ class CreateListingForm(forms.Form):
         widget=forms.NumberInput(attrs={
             "class": "form-control"
         }),
-        validators=[MinValueValidator(1)]
     )
     image_url = forms.URLField(
         label="URL to Listing Image:",
@@ -43,11 +41,11 @@ class CreateListingForm(forms.Form):
     )
 
 
-class PlaceBidForm(forms.Form):
-    place_bid = forms.IntegerField(
-        required=True,
-        widget=forms.NumberInput(attrs={
-            "class": "form-control",
-            "placeholder": "Bid"
-        }),
-    )
+# class PlaceBidForm(forms.Form):
+#     place_bid = forms.IntegerField(
+#         required=True,
+#         widget=forms.NumberInput(attrs={
+#             "class": "form-control",
+#             "placeholder": "Bid"
+#         }),
+#     )

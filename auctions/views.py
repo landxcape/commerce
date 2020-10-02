@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.db.models import Max
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -7,7 +8,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from .models import User, AuctionListings, Bids
-from .forms import CreateListingForm, PlaceBidForm
+from .forms import CreateListingForm
 
 
 def index(request):
@@ -116,16 +117,33 @@ def create_listing(request):
 
 @login_required(login_url="login")
 def listing(request, _listing_id):
+    get_listing = AuctionListings.objects.get(id=_listing_id)
+    max_bid = Bids.objects.filter(listing_id=get_listing).aggregate(
+        Max('amount')).get("amount__max")
     return render(request, "auctions/listing.html", {
-        "listing": AuctionListings.objects.get(id=_listing_id),
-        "place_bid_form": PlaceBidForm()
+        "listing": get_listing,
+        "max_bid": Bids.objects.filter(amount=max_bid).last()
     })
 
 
 @login_required(login_url="login")
 def place_bid(request, _listing_id):
     if request.method == "POST":
-        pass
+        _place_bid = request.POST["place_bid"]
+        try:
+            p_bid = Bids(
+                user_id=request.user,
+                listing_id=AuctionListings.objects.get(id=_listing_id),
+                amount=_place_bid
+            )
+            p_bid.save()
+            message = "Saved..."
+        except IntegrityError:
+            message = "Error. Fill the bid correctly."
+        return render(request, "auctions/listing.html", {
+            "message": message,
+            "listing": AuctionListings.objects.get(id=_listing_id),
+        })
     return render(request, "auctions/index.html", {
         "message": "Select a product first to bid...",
         "active_listings": AuctionListings.objects.all(),

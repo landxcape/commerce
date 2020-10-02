@@ -3,28 +3,38 @@
 {% block body %}
 
 <div class="container">
-    <h1>{{ listing.title }}</h1>
+    <h1>{{ listing.title }}</h1><br>
+
     <div class="row">
         <div class="d-flex justify-content-center" style="max-height: 300px; width: 100%">
             <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="height: 100%;">
         </div>
-    </div>
+    </div><br>
+
     <div class="d-flex justify-content-start">
         {{ listing.description }}
-    </div>
+    </div><br>
+
     <div class="d-flex justify-content-start">
-        <h2><strong>${{ listing.bid.all.last.amount }}</strong></h2>
-    </div>
+        <h2><strong>${{ max_bid.amount }}</strong> by {{ max_bid.user_id }}</h2>
+    </div><br>
+
+
+    {% if message %}
+    {{ message }}
+    {% endif %}
+
+
     <form action="{% url 'place_bid' listing.id %}" method="POST">
         {% csrf_token %}
         <p style="font-size: 10px;">{{ listing.bid.all.count }} bid(s) so far.</p>
-        {% for field in place_bid_form.visible_fields %}
         <div class="form-group">
-            {{ field }}
+            <input type="number" name="place_bid" class="form-control" placeholder="Bid" required=true
+                min="{{ max_bid.amount }}">
         </div>
-        {% endfor %}
         <input type="submit" value="Place Bid">
-    </form>
+    </form><br>
+
     <div>
         <h2>Details:</h2>
         <ul>
