@@ -21,7 +21,10 @@
                     <strong>{{ active_listing.title }}</strong>
                 </div>
                 <div class="row overflow-hidden" style="height: 25%;">
-                    <strong>Price: ${{ active_listing.bid.all.last.amount }}</strong>
+                    <strong>Price: ${{ active_listing.bid.all.last.amount }}
+                        {% if not active_listing.active_status %}
+                        (Closed)
+                        {% endif %}</strong>
                 </div>
                 <div class="row overflow-hidden" style="height: 25%;">
                     {{ active_listing.description }}

@@ -5,7 +5,33 @@
 <div class="container">
     <h1>{{ listing.title }}</h1><br>
 
+
     <div class="d-flex justify-content-end">
+        {% if listing.user_id == request.user %}
+        {% if close_listing_message %}
+        {{ close_listing_message }}
+        {% endif %}
+        {% if listing.active_status %}
+        {% if close_listing_message %}
+        <a href="{% url 'delete_listing' listing.id %}" role="button" class="btn btn-outline-danger btn-sm ml-3">
+            Delete Listing
+        </a>
+        {% else %}
+        <a href="{% url 'close_listing' listing.id %}" role="button" class="btn btn-outline-success btn-sm">
+            Close Listing
+        </a>
+        {% endif %}
+
+        {% else %}
+        <button disabled="disabled" class="btn btn-secondary btn-sm">
+            Listing closed
+        </button>
+        <a href="{% url 'delete_listing' listing.id %}" role="button" class="btn btn-outline-danger btn-sm ml-3">
+            Delete Listing
+        </a>
+        {% endif %}
+
+        {% else %}
         <a href="{% url 'watchlist_add' listing.id %}" role="button" class="btn btn-outline-success btn-sm">
             {% if on_watchlist %}
             Remove from
@@ -14,6 +40,7 @@
             {% endif %}
             Watchlist
         </a>
+        {% endif %}
     </div>
 
     <div class="row">
@@ -26,17 +53,33 @@
         {{ listing.description }}
     </div><br>
 
+    {% if listing.active_status %}
     <div class="d-flex justify-content-start">
         <h2><strong>Highest bid: ${{ max_bid.amount }}</strong></h2>
     </div>
-    <div>by {{ max_bid.user_id }} at {{ max_bid.creation_date }}</div>
+    <div>by <strong>{{ max_bid.user_id }}</strong> at {{ max_bid.creation_date }}</div>
+    {% else %}
+    <div class="d-flex justify-content-start">
+        {% if max_bid.user_id == request.user %}
+        <h1><strong>
+                Congratulations!! You won this Auction with bid of ${{ max_bid.amount }}.
+            </strong></h1>
+        {% else %}
+        <h2><strong>
+                Bidding closed:
+                Winner is
+                {{ max_bid.user_id }}
+                at
+                ${{ max_bid.amount }}
+            </strong></h2>
+        {% endif %}
+
+    </div>
+    {% endif %}
     <br>
 
 
-    {% if message %}
-    {{ message }}
-    {% endif %}
-
+    {% if listing.active_status %}
     <form action="{% url 'place_bid' listing.id %}" method="POST">
         {% csrf_token %}
         <p style="font-size: 10px;">{{ listing.bid.all.count }} bid(s) so far.</p>
@@ -46,6 +89,17 @@
         </div>
         <input type="submit" value="Place Bid" class="btn btn-success btn-lg">
     </form><br>
+
+    {% else %}
+    <p style="font-size: 10px;">
+        Total bids: {{ listing.bid.all.count }}.</p>
+    <div class="form-group">
+        <input disabled type="number" name="place_bid" class="form-control" placeholder="Bid">
+    </div>
+    <input disabled type="submit" value="Place Bid" class="btn btn-success btn-lg">
+    <br>
+    {% endif %}
+    <br>
 
     <div>
         <h2>Details:</h2>

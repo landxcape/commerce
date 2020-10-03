@@ -1,0 +1,30 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+Delete Listing
+{% endblock title %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-center">
+        <h3>Are you Sure You Want to Delete this Listing?</h3>
+    </div><br>
+    <div class="row">
+        <div class="d-flex justify-content-center" style="max-height: 300px; width: 100%">
+            <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="height: 100%;">
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <h1><strong>{{ listing.title }}</strong></h1>
+    </div><br>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'listing' listing.id %}" role="button" class="btn btn-success btn-lr mr-3">
+            &#8592; Back to Listing
+        </a>
+        <form action="{% url 'delete_listing' listing.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-outline-danger btn-lr ml-3" value="Delete Listing">
+        </form>
+    </div>
+</div>
+{% endblock body %}

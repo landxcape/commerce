@@ -117,8 +117,7 @@ def create_listing(request):
 @login_required(login_url="login")
 def listing(request, _listing_id):
     get_listing = AuctionListings.objects.get(id=_listing_id)
-    max_bid = Bids.objects.filter(listing_id=get_listing).aggregate(
-        Max('amount')).get("amount__max")
+    max_bid = get_max_bid(get_listing, Bids)
     get_watchlist = Watchlists.objects.filter(
         user_id=request.user, item=get_listing.id).exists()
     return render(request, "auctions/listing.html", {
@@ -160,3 +159,38 @@ def watchlist_add(request, _listing_id):
         user_id=request.user)
     user_watchlist.item.add(get_listing)
     return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
+
+
+@login_required(login_url="login")
+def close_listing(request, _listing_id):
+    get_listing = get_object_or_404(AuctionListings, pk=_listing_id)
+    max_bid = get_max_bid(get_listing, Bids)
+    get_watchlist = Watchlists.objects.filter(
+        user_id=request.user, item=get_listing.id).exists()
+    if Bids.objects.filter(amount=max_bid).first().user_id != request.user:
+        get_listing.active_status = False
+        get_listing.save()
+        return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
+    return render(request, "auctions/listing.html", {
+        "listing": get_listing,
+        "max_bid": Bids.objects.filter(amount=max_bid).first(),
+        "on_watchlist": get_watchlist,
+        "close_listing_message": "No Highest bidder except the Auctioneer."
+    })
+
+
+@login_required(login_url="login")
+def delete_listing(request, _listing_id):
+    get_listing = get_object_or_404(AuctionListings, pk=_listing_id)
+
+    if request.method == "POST":
+        get_listing.delete()
+        return HttpResponseRedirect(reverse("index"))
+    return render(request, "auctions/delete_listing.html", {
+        "listing": get_listing
+    })
+
+
+def get_max_bid(listing, bid):
+    return bid.objects.filter(listing_id=listing).aggregate(
+        Max('amount')).get("amount__max")
