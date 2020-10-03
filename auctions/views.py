@@ -2,11 +2,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.db.models import Max
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, AuctionListings, Bids
+from .models import User, AuctionListings, Bids, Watchlists
 from .forms import CreateListingForm
 
 
@@ -119,9 +119,12 @@ def listing(request, _listing_id):
     get_listing = AuctionListings.objects.get(id=_listing_id)
     max_bid = Bids.objects.filter(listing_id=get_listing).aggregate(
         Max('amount')).get("amount__max")
+    get_watchlist = Watchlists.objects.filter(
+        user_id=request.user, item=get_listing.id).exists()
     return render(request, "auctions/listing.html", {
         "listing": get_listing,
-        "max_bid": Bids.objects.filter(amount=max_bid).first()
+        "max_bid": Bids.objects.filter(amount=max_bid).first(),
+        "on_watchlist": get_watchlist
     })
 
 
@@ -143,3 +146,17 @@ def place_bid(request, _listing_id):
         "message": "Select a product first to bid...",
         "active_listings": AuctionListings.objects.all(),
     })
+
+
+@login_required(login_url="login")
+def watchlist_add(request, _listing_id):
+    get_listing = get_object_or_404(AuctionListings, pk=_listing_id)
+    get_watchlist = Watchlists.objects.filter(
+        user_id=request.user, item=get_listing.id)
+    if get_watchlist.exists():
+        get_watchlist.delete()
+        return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
+    user_watchlist, created = Watchlists.objects.get_or_create(
+        user_id=request.user)
+    user_watchlist.item.add(get_listing)
+    return HttpResponseRedirect(reverse("listing", args=[_listing_id]))

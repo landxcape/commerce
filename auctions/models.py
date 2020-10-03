@@ -33,3 +33,13 @@ class Comments(models.Model):
         User, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField()
     created_date = models.DateTimeField(auto_now=True)
+
+
+class Watchlists(models.Model):
+    user_id = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="watchlists")
+    item = models.ManyToManyField(
+        AuctionListings, blank=True, related_name="watchlists")
+
+    def __str__(self):
+        return f"{self.user}'s Watchlist"
