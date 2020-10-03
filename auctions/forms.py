@@ -49,3 +49,13 @@ class CreateListingForm(forms.Form):
 #             "placeholder": "Bid"
 #         }),
 #     )
+
+class CommentForm(forms.Form):
+    comment = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            "class": "form-control",
+            "placeholder": "Comment",
+            "rows": 3
+        })
+    )

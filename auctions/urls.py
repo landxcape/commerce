@@ -17,5 +17,7 @@ urlpatterns = [
     path("close_listing/<str:_listing_id>",
          views.close_listing, name="close_listing"),
     path("delete_listing/<str:_listing_id>",
-         views.delete_listing, name="delete_listing")
+         views.delete_listing, name="delete_listing"),
+    path("make_commtnt/<str:_listing_id>",
+         views.make_comment, name="make_comment")
 ]

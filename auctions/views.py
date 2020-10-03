@@ -6,8 +6,8 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, AuctionListings, Bids, Watchlists
-from .forms import CreateListingForm
+from .models import User, AuctionListings, Bids, Comments, Watchlists
+from .forms import CreateListingForm, CommentForm
 
 
 def index(request):
@@ -68,7 +68,11 @@ def register(request):
 
 
 def categories(request):
-    return render(request, "auctions/categories.html")
+    categories = AuctionListings.objects.order_by().values_list("category").distinct()
+    categories_list = map(lambda c: c[0], categories)
+    return render(request, "auctions/categories.html", {
+        "categories": categories_list
+    })
 
 
 def watchlist(request):
@@ -116,14 +120,16 @@ def create_listing(request):
 
 @login_required(login_url="login")
 def listing(request, _listing_id):
-    get_listing = AuctionListings.objects.get(id=_listing_id)
+    get_listing = AuctionListings.objects.get(pk=_listing_id)
     max_bid = get_max_bid(get_listing, Bids)
     get_watchlist = Watchlists.objects.filter(
         user_id=request.user, item=get_listing.id).exists()
     return render(request, "auctions/listing.html", {
         "listing": get_listing,
         "max_bid": Bids.objects.filter(amount=max_bid).first(),
-        "on_watchlist": get_watchlist
+        "on_watchlist": get_watchlist,
+        "comment_form": CommentForm(),
+        "comments": Comments.objects.filter(listing_id=get_listing).order_by("-created_date")
     })
 
 
@@ -189,6 +195,25 @@ def delete_listing(request, _listing_id):
     return render(request, "auctions/delete_listing.html", {
         "listing": get_listing
     })
+
+
+@login_required(login_url="login")
+def make_comment(request, _listing_id):
+    get_listing = get_object_or_404(AuctionListings, pk=_listing_id)
+
+    if request.method == "POST":
+        comment = request.POST["comment"]
+        try:
+            m_comment = Comments(
+                user_id=request.user,
+                listing_id=AuctionListings.objects.get(id=_listing_id),
+                text=comment
+            )
+            m_comment.save()
+            return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
+        except IntegrityError:
+            return HttpResponseRedirect(reverse("listing", args=[_listing_id]))
+    return HttpResponseRedirect(reverse("index"))
 
 
 def get_max_bid(listing, bid):

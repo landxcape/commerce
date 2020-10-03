@@ -1,5 +1,9 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}
+Create Listing
+{% endblock title %}
+
 {% block body %}
 <h1>Create Listing</h1>
 
@@ -12,12 +16,13 @@
         {% csrf_token %}
 
         {% for field in create_listing_form.visible_fields %}
+        <br>
         <div class="form-group">
             {{ field.label }}
             {{ field }}
-        </div><br>
+        </div>
         {% endfor %}
-        <input type="submit" value="Create Listing" class="btn btn-success btn-sm">
+        <input type="submit" value="Create Listing" class="btn btn-success">
     </form>
 </div>
 {% endblock body %}
