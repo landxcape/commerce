@@ -5,5 +5,50 @@ Watchlist
 {% endblock title %}
 
 {% block body %}
-<h1>Watchlist</h1>
+{% if my_watchlist %}
+<div class="container">
+    <h1>My Watchlist:</h1><br>
+    {% for watchlist in my_watchlist.first.item.all %}
+    <a href="{% url 'listing' watchlist.id %}" style="color: black;">
+        <div class="row list-box">
+            <div class="col-3" style="width: auto; max-height: 100px">
+                <img src="{{ watchlist.image_url }}" alt="{{ watchlist.title }}" style="height: 100%;">
+            </div>
+            <div class="col-9" style="max-height: 100px;">
+                <div class="row overflow-hidden" style="height: 25%;">
+                    <strong>{{ watchlist.title }}</strong>
+                </div>
+                <div class="row overflow-hidden" style="height: 25%;">
+                    <strong>Price: ${{ watchlist.bid.all.last.amount }}
+                        {% if not watchlist.active_status %}
+                        (Closed)
+                        {% endif %}</strong>
+                </div>
+                <div class="row overflow-hidden" style="height: 25%;">
+                    {{ watchlist.description }}
+                </div>
+                <div class="row overflow-hidden" style="color: gray; height: 25%;">
+                    Created on: {{ watchlist.creation_time }}
+                </div>
+            </div>
+            <div>posted by: {{ watchlist.user_id.username }}</div>
+        </div>
+    </a>
+    <hr class="m-3">
+    {% endfor %}
+</div>
+{% else %}
+<div class="col">
+    <div class="d-flex justify-content-center">
+        <h2>Nothing to Display.</h2>
+    </div>
+    <hr>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'index' %}" role="button" class="btn btn-success btn-lr mr-3">
+            &#8592; Add something to Watchlist.
+        </a>
+    </div>
+</div>
+{% endif %}
+
 {% endblock body %}

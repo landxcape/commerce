@@ -81,8 +81,12 @@ def categories(request):
     })
 
 
+@login_required(login_url="login")
 def watchlist(request):
-    return render(request, "auctions/watchlist.html")
+    my_watchlist = Watchlists.objects.filter(user_id=request.user)
+    return render(request, "auctions/watchlist.html", {
+        "my_watchlist": my_watchlist
+    })
 
 
 @login_required(login_url="login")

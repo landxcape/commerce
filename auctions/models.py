@@ -41,6 +41,3 @@ class Watchlists(models.Model):
         User, on_delete=models.CASCADE, related_name="watchlists")
     item = models.ManyToManyField(
         AuctionListings, blank=True, related_name="watchlists")
-
-    def __str__(self):
-        return f"{self.user}'s Watchlist"
