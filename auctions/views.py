@@ -68,6 +68,12 @@ def register(request):
 
 
 def categories(request):
+    if request.method == "POST":
+        category = request.POST["category"]
+        category_list = AuctionListings.objects.filter(category=category)
+        return render(request, "auctions/categories.html", {
+            "category_list": category_list
+        })
     categories = AuctionListings.objects.order_by().values_list("category").distinct()
     categories_list = map(lambda c: c[0], categories)
     return render(request, "auctions/categories.html", {

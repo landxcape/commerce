@@ -5,11 +5,53 @@ Categories
 {% endblock title %}
 
 {% block body %}
-<h1>Categories</h1>
 
-{% for category in categories %}
-<div>
-    {{ category }}
+{% if categories %}
+<h1>Categories</h1>
+<ul>
+    {% for category in categories %}
+    <li>
+        <form action="{% url 'categories' %}" method="POST">
+            {% csrf_token %}
+            <input class="btn link" type="submit" name="category" value="{{ category }}">
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+{% else %}
+<div class="container">
+    <h1>{{ category_list.first.category }}:</h1><br>
+    {% for category_listing in category_list %}
+    <a href="{% url 'listing' category_listing.id %}" style="color: black;">
+        <div class="row list-box">
+            <div class="col-3" style="width: auto; max-height: 100px">
+                <img src="{{ category_listing.image_url }}" alt="{{ category_listing.title }}" style="height: 100%;">
+            </div>
+            <div class="col-9" style="max-height: 100px;">
+                <div class="row overflow-hidden" style="height: 25%;">
+                    <strong>{{ category_listing.title }}</strong>
+                </div>
+                <div class="row overflow-hidden" style="height: 25%;">
+                    <strong>Price: ${{ category_listing.bid.all.last.amount }}
+                        {% if not category_listing.active_status %}
+                        (Closed)
+                        {% endif %}</strong>
+                </div>
+                <div class="row overflow-hidden" style="height: 25%;">
+                    {{ category_listing.description }}
+                </div>
+                <div class="row overflow-hidden" style="color: gray; height: 25%;">
+                    Created on: {{ category_listing.creation_time }}
+                </div>
+            </div>
+            <div>posted by: {{ category_listing.user_id.username }}</div>
+        </div>
+    </a>
+    <hr class="m-3">
+    {% endfor %}
 </div>
-{% endfor %}
+
+{% endif %}
+
 {% endblock body %}
